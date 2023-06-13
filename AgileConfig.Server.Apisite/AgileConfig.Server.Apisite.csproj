@@ -49,6 +49,9 @@
     <Content Update="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+		<Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+		<Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+		<Content Update="appsettings.PreRelease.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
   <ItemGroup>
