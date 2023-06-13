@@ -10,6 +10,7 @@
     <FileVersion>1.6.18</FileVersion>
     <Authors>kklldog</Authors>
     <Company>kklldog</Company>
+		<SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
