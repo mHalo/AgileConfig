@@ -28,7 +28,11 @@ namespace AgileConfig.Server.Apisite
                 .AddEnvironmentVariables()
                 .Build();
 #else
-            Global.Config = builder.AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+            Global.Config = builder
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("hosting.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
 #endif
             var host = CreateWebHostBuilder(args)
                 .Build();
