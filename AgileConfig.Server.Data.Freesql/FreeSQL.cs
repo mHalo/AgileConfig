@@ -2,6 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using FreeSql.DataAnnotations;
+using FreeSql.Internal;
+using System.Linq;
+using System.Reflection;
 
 namespace AgileConfig.Server.Data.Freesql
 {
@@ -14,9 +18,19 @@ namespace AgileConfig.Server.Data.Freesql
         static FreeSQL()
         {
             _freesql = new FreeSql.FreeSqlBuilder()
-                          .UseConnectionString(ProviderToFreesqlDbType(DbProvider), DbConnection)
-                          .Build();
+                        .UseMappingPriority(MappingPriorityType.Attribute,MappingPriorityType.FluentApi,MappingPriorityType.Aop)
+                        .UseConnectionString(ProviderToFreesqlDbType(DbProvider), DbConnection)
+                        .Build();
             FluentApi.Config(_freesql);
+            _freesql.Aop.ConfigEntity+=(s,e)=>{
+                var name = e.EntityType.GetCustomAttribute<TableAttribute>()?.Name ?? //特性
+                            _freesql.CodeFirst.GetConfigEntity(e.EntityType)?.Name ?? //FluentApi
+                            e.EntityType.Name;
+                if (name.Contains(".") == false) {
+                    e.ModifyResult.Name="dev." + name;
+                    Console.WriteLine("table-name-dev:" + e.ModifyResult.Name);
+                }
+            };
             EnsureTables.Ensure(_freesql);
         }
 
@@ -52,10 +66,20 @@ namespace AgileConfig.Server.Data.Freesql
                 }
 
                 var sql = new FreeSql.FreeSqlBuilder()
+                        .UseMappingPriority(MappingPriorityType.Attribute,MappingPriorityType.FluentApi,MappingPriorityType.Aop)
                         .UseConnectionString(ProviderToFreesqlDbType(provider), conn)
                         .Build();
                 FluentApi.Config(sql);
-                EnsureTables.Ensure(sql);
+                sql.Aop.ConfigEntity+=(s,e)=>{
+                    var name = e.EntityType.GetCustomAttribute<TableAttribute>()?.Name ?? //特性
+                                sql.CodeFirst.GetConfigEntity(e.EntityType)?.Name ?? //FluentApi
+                                e.EntityType.Name;
+                    if (name.Contains(".") == false) {
+                        e.ModifyResult.Name=$"{env}.{name}";
+                        Console.WriteLine($"table-name-{env}:" + e.ModifyResult.Name);
+                    }
+                };
+                EnsureTables.Ensure(sql, env);
 
                 _envFreesqls.Add(key, sql);
 

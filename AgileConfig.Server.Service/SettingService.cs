@@ -16,7 +16,7 @@ namespace AgileConfig.Server.Service
         public const string SuperAdminId = "super_admin";
         public const string SuperAdminUserName = "admin";
 
-        public const string DefaultEnvironment = "DEV,TEST,STAGING,PROD";
+        public const string DefaultEnvironment = "DEV,TEST,PROD";
         public const string DefaultEnvironmentKey = "environment";
         public const string DefaultJwtSecretKey = "jwtsecret";
 
@@ -131,10 +131,8 @@ namespace AgileConfig.Server.Service
                     CreateTime = DateTime.Now
                 });
                 var result = await _dbContext.SaveChangesAsync();
-
                 return result > 0;
             }
-
             return true;
         }
 

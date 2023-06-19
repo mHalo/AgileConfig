@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+		<NoWarn>$(NoWarn);CA2254;IDE1006;IDE0079;CS1998</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
