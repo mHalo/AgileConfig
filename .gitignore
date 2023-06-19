@@ -22,6 +22,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Pp]ublish-release/
+AgileConfig.Server.Apisite/wwwroot/ui/*
 
 # Visual Studio 2015 cache/options directory
 .vs/
