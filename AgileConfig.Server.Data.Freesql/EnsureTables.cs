@@ -19,7 +19,7 @@ namespace AgileConfig.Server.Data.Freesql
             "SELECT COUNT(1) FROM dbo.SYSOBJECTS WHERE ID = object_id(N'[dbo].[agc_app]') and OBJECTPROPERTY(id, N'IsUserTable') = 1";
 
         private const string Oracle_ExistTableSql = "select count(1) from user_tables where table_name = 'agc_app'";
-        private const string PostgreSql_ExistTableSql = "select count(1) from {0}pg_class where relname = 'agc_app'";
+        private const string PostgreSql_ExistTableSql = @"CREATE SCHEMA IF NOT EXISTS ""{0}"";select count(1) from information_schema.tables where table_schema=@schema and table_type='BASE TABLE' and table_name='agc_app';";
 
         public static bool ExistTable(IFreeSql instance, string env = "")
         {
@@ -42,32 +42,29 @@ namespace AgileConfig.Server.Data.Freesql
                     sql = Oracle_ExistTableSql;
                     break;
                 case FreeSql.DataType.PostgreSQL:
-                    sql = string.Format(PostgreSql_ExistTableSql, string.IsNullOrEmpty(env) ? "" : $"{env}.");
+                    sql = string.Format(PostgreSql_ExistTableSql, env);
                     break;
                 default:
                     sql = Sqlite_ExistTableSql;
                     break;
             }
 
-            try{
-                dynamic count = instance.Ado.ExecuteScalar(sql, new { schema });
+#if DEBUG
+            Console.WriteLine($"env:{env}    schema:{env}   sql:{sql}");
+#endif
 
-                Console.WriteLine($"env:{env}   " + count + "   " + sql);
-                return count > 0;
-            }
-            catch(Exception ex){
-                
-            }
+
+            dynamic count = instance.Ado.ExecuteScalar(sql, new { schema });
+            return count > 0;
         }
 
         /// <summary>
         /// 先判断是否建过表了，如果没有则新建表
         /// </summary>
         /// <param name="instance"></param>
-        public static void Ensure(IFreeSql instance, string env = "")
+        public static void Ensure(IFreeSql instance, string env = "DEV")
         {
-            Console.WriteLine("env:" + env);
-            if (!ExistTable(instance, env.ToLower()))
+            if (!ExistTable(instance, env))
             {
                 if (instance.Ado.DataType == FreeSql.DataType.Oracle)
                 {

@@ -27,10 +27,6 @@ namespace AgileConfig.Server.Data.Freesql
                 //如果没有配置对应环境的连接，使用默认连接
                 return new FreeSqlContext(FreeSQL.Instance);
             }
-
-            #if DEBUG
-            Console.WriteLine("create env:{env} freesql dbcontext instance .");
-            #endif
             
             return new FreeSqlContext(FreeSQL.GetInstance(env));
         }

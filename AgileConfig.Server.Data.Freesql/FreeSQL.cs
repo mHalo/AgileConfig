@@ -27,8 +27,10 @@ namespace AgileConfig.Server.Data.Freesql
                             _freesql.CodeFirst.GetConfigEntity(e.EntityType)?.Name ?? //FluentApi
                             e.EntityType.Name;
                 if (name.Contains(".") == false) {
-                    e.ModifyResult.Name="dev." + name;
-                    Console.WriteLine("table-name-dev:" + e.ModifyResult.Name);
+                    e.ModifyResult.Name="DEV." + name;
+                    #if DEBUG
+                    Console.WriteLine("table-name-DEV:" + e.ModifyResult.Name);
+                    #endif
                 }
             };
             EnsureTables.Ensure(_freesql);
@@ -51,10 +53,13 @@ namespace AgileConfig.Server.Data.Freesql
             var provider = Global.Config[$"db:env:{env}:provider"];
             var conn = Global.Config[$"db:env:{env}:conn"];
 
-            var key = provider;
+            var key = $"{env}-{provider}";
 
             if (_envFreesqls.ContainsKey(key))
             {
+                #if DEBUG
+                Console.WriteLine($"resolve from cache@env:{env} freesql dbcontext instance .");
+                #endif
                 return _envFreesqls[key];
             }
 
@@ -62,6 +67,9 @@ namespace AgileConfig.Server.Data.Freesql
             {
                 if (_envFreesqls.ContainsKey(key))
                 {
+                    #if DEBUG
+                    Console.WriteLine($"resolve from cache@env:{env} freesql dbcontext instance .");
+                    #endif
                     return _envFreesqls[key];
                 }
 
@@ -76,12 +84,18 @@ namespace AgileConfig.Server.Data.Freesql
                                 e.EntityType.Name;
                     if (name.Contains(".") == false) {
                         e.ModifyResult.Name=$"{env}.{name}";
+                        #if DEBUG
                         Console.WriteLine($"table-name-{env}:" + e.ModifyResult.Name);
+                        #endif
                     }
                 };
                 EnsureTables.Ensure(sql, env);
 
                 _envFreesqls.Add(key, sql);
+
+                #if DEBUG
+                Console.WriteLine($"create env:{env} freesql dbcontext instance .");
+                #endif
 
                 return sql;
             }
